@@ -1,0 +1,54 @@
+# WOLF SHEEP CABBAGE
+
+def isSafe(state):
+    """Check if the current state is safe (no one eats anyone)."""
+    farmer, wolf, sheep, cabbage = state
+    # It's safe if the farmer is with the sheep or wolf is not with the sheep,
+    # and if the farmer is with the cabbage or the sheep is not with the cabbage.
+    return (farmer == sheep or wolf != sheep) and (farmer == cabbage or sheep != cabbage)
+
+def successors(state):
+    """Generate all possible next states from the current state."""
+    farmer, wolf, sheep, cabbage = state
+    s = []
+    # Possible moves: move nothing, wolf, sheep, cabbage
+    for move in [(1, 0, 0, 0), (0, 1, 0, 0), (0, 0, 1, 0), (0, 0, 0, 1)]:
+        newState = tuple(x ^ move[i] for i, x in enumerate(state))
+        # Ensure the farmer's move matches the item being moved or farmer moves alone.
+        if newState[0] != farmer:
+            s.append(newState)
+    return [newState for newState in s if isSafe(newState)]
+
+def dfs(startState, goalState):
+    frontier = [startState]
+    cameFrom = {startState: None}
+    
+    while frontier:
+        currentState = frontier.pop()
+        
+        if currentState == goalState:
+            return reconstructPath(cameFrom, startState, currentState)
+        
+        for nextState in successors(currentState):
+            if nextState not in cameFrom:
+                frontier.append(nextState)
+                cameFrom[nextState] = currentState
+
+def reconstructPath(cameFrom, start, goal):
+    current = goal
+    path = []
+    while current != start:
+        path.append(current)
+        current = cameFrom[current]
+    path.append(start)
+    path.reverse()
+    return path
+
+startState = (1, 1, 1, 1)  # All on the initial side
+goalState = (0, 0, 0, 0)  # All on the opposite side
+
+path = dfs(startState, goalState)
+if path:
+    print("Path found:", path)
+else:
+    print("No path found.")
