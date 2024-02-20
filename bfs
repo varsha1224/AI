@@ -1,0 +1,48 @@
+# BFS FOR PUZZLES
+
+from collections import deque
+
+def successors(currentState):
+    """Generate successors by either adding 2 or multiplying by 2."""
+    return [currentState + 2, currentState * 2]
+
+def bfs(startState, goalState, successors):
+    """Breadth-first search algorithm."""
+    queue = deque([startState])  # Queue for BFS
+    cameFrom = {startState: None}  # Track the path
+    
+    while queue:
+        currentState = queue.popleft()
+        
+        if currentState == goalState:
+            return reconstructPath(cameFrom, startState, goalState)
+        
+        for nextState in successors(currentState):
+            if nextState not in cameFrom:
+                queue.append(nextState)
+                cameFrom[nextState] = currentState
+                
+    return None  # If no path found
+
+def reconstructPath(cameFrom, start, goal):
+    """Reconstruct the path from start to goal."""
+    current = goal
+    path = []
+    while current != start:
+        path.append(current)
+        current = cameFrom[current]
+    path.append(start)
+    path.reverse()
+    return path
+
+def main():
+    startState = 1
+    goalState = 10
+    path = bfs(startState, goalState, successors)
+    
+    if path:
+        print("Path found:", path)
+    else:
+        print("No path found.")
+
+main()
