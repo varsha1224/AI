@@ -1,0 +1,48 @@
+# DFS FOR PUZZLES
+
+def dfs(startState, goalTest, successors):
+    frontier = [startState]  # Stack for DFS
+    cameFrom = {startState: None}
+    
+    while frontier:
+        currentState = frontier.pop()  # Pop from the stack to explore depth-first
+        
+        if goalTest(currentState):
+            return reconstructPath(cameFrom, startState, currentState)
+        
+        for next in successors(currentState):
+            if next not in cameFrom:
+                frontier.append(next)  # Push to the stack
+                cameFrom[next] = currentState
+
+def reconstructPath(cameFrom, start, goal):
+    current = goal
+    path = []
+    while current != start:
+        path.append(current)
+        current = cameFrom[current]
+    path.append(start)
+    path.reverse()
+    return path
+
+def main():
+    startState = 1
+    goalState = 10
+
+    def goalTestWrapper(state):
+        return goalTest(state, goalState)
+
+    path = dfs(startState, goalTestWrapper, successors)
+    if path:
+        print("Path found:", path)
+    else:
+        print("No path found.")
+
+# The goalTest and successors functions remain the same as before.
+def goalTest(currentState, goalState=10):
+    return currentState == goalState
+
+def successors(currentState):
+    return [currentState + 2, currentState * 2]
+
+main()
