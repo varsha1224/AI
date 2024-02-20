@@ -1,0 +1,59 @@
+# A* FOR PUZZLES
+
+import heapq
+
+def aStar(startState, goalTest, successors, heuristic):
+    frontier = []  # Priority queue: elements are (priority, state)
+    heapq.heappush(frontier, (heuristic(startState), startState))
+    cameFrom = {startState: None}
+    costSoFar = {startState: 0}  # Cost from start to the node n
+    
+    while frontier:
+        currentPriority, currentState = heapq.heappop(frontier)
+        
+        if goalTest(currentState):
+            return reconstructPath(cameFrom, startState, currentState)
+        
+        for next in successors(currentState):
+            newCost = costSoFar[currentState] + 1  # Assuming each step costs 1
+            if next not in costSoFar or newCost < costSoFar[next]:
+                costSoFar[next] = newCost
+                priority = newCost + heuristic(next)
+                heapq.heappush(frontier, (priority, next))
+                cameFrom[next] = currentState
+
+def reconstructPath(cameFrom, start, goal):
+    current = goal
+    path = []
+    while current != start:
+        path.append(current)
+        current = cameFrom[current]
+    path.append(start)
+    path.reverse()
+    return path
+
+def main():
+    startState = 1
+    goalState = 10
+
+    def goalTestWrapper(state):
+        return goalTest(state, goalState)
+
+    def heuristic(state):
+        # Simple heuristic: distance from state to goal
+        return abs(goalState - state)
+
+    path = aStar(startState, goalTestWrapper, successors, heuristic)
+    if path:
+        print("Path found:", path)
+    else:
+        print("No path found.")
+
+# The goalTest and successors functions remain the same as before.
+def goalTest(currentState, goalState=10):
+    return currentState == goalState
+
+def successors(currentState):
+    return [currentState + 2, currentState * 2]
+
+main()
