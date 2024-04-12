@@ -1,0 +1,31 @@
+def expected_sum_discounted_rewards(states, rewards, transitions, discount_factor, initial_state):
+  # Initialize a dictionary to store expected rewards for each state
+  value_of_states = {state: 0 for state in states}
+
+  # Iterate for multiple steps to achieve convergence (optional)
+  for _ in range(10):  # Adjust the number of iterations as needed
+    # Update value for each state using the Bellman equation
+    for state in states:
+      expected_future_reward = 0
+      for next_state, probability in transitions[state].items():
+        # Expected future reward considering all possible next states
+        expected_future_reward += probability * (rewards[next_state] + discount_factor * value_of_states[next_state])
+      value_of_states[state] = rewards[state] + discount_factor * expected_future_reward
+
+  return value_of_states
+
+states = ["Sunny", "Windy", "Hail"]
+rewards = {"Sunny": 4, "Windy": 0, "Hail": -8}
+transitions = {
+  "Sunny": {"Sunny": 0.5, "Windy": 0.5, "Hail": 0.5},
+  "Windy": {"Sunny": 0.5, "Windy": 0.5, "Hail": 0.5},
+  "Hail": {"Sunny": 0.5, "Windy": 0.5, "Hail": 0.5},
+}
+discount_factor = 0.9
+initial_state = "Sunny"
+
+expected_rewards = expected_sum_discounted_rewards(states, rewards, transitions, discount_factor, initial_state)
+
+print(f"Expected sum of discounted rewards for each state:")
+for state, reward in expected_rewards.items():
+  print(f"\t{state}: {reward:.2f}")
