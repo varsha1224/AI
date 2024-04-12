@@ -1,0 +1,54 @@
+H_table = {'A': 0.2, 'C': 0.3, 'G': 0.3, 'T': 0.2}
+L_table = {'A': 0.3, 'C': 0.2, 'G': 0.2, 'T': 0.3}
+start = {'H': 0.5, 'L': 0.5}
+H_H = 0.5
+H_L = 0.5
+L_H = 0.4
+L_L = 0.6
+seq = 'GGCACTGAA'
+H = []
+L = []
+state_sequence = []
+
+# Compute the probabilities for the first observation
+first_H = start['H'] * H_table[seq[0]]
+first_L = start['L'] * L_table[seq[0]]
+H.append(first_H)
+L.append(first_L)
+
+# Determine the initial state based on the highest probability
+if first_H > first_L:
+    state_sequence.append('H')
+else:
+    state_sequence.append('L')
+
+# Iterate over the remaining observations
+for i in range(1, len(seq)):
+    sum_H = sum_L = 0
+    
+    # Calculate the probabilities for transitioning to H
+    sum_H += H[len(H) - 1] * H_H * H_table[seq[i]]
+    sum_H += L[len(L) - 1] * L_H * H_table[seq[i]]
+    #sum_H = max(prob_H, prob_L)
+
+    # Calculate the probabilities for transitioning to L
+    sum_L += L[len(L) - 1] * L_L * L_table[seq[i]]
+    sum_L += H[len(H) - 1] * H_L * L_table[seq[i]]
+    #sum_L = max(prob_H, prob_L)
+
+    # Store the probabilities for the current observation
+    H.append(sum_H)
+    L.append(sum_L)
+
+    # Determine the state with the highest probability
+    if sum_H > sum_L:
+        state_sequence.append('H')
+    else:
+        state_sequence.append('L')
+
+# Compute the probability of the entire sequence
+prob = H[len(H) - 1] + L[len(L) - 1]
+print("Probability of the sequence:", prob)
+
+# Print the expected state sequence
+print("Expected state sequence:", "".join(state_sequence))
